@@ -2,8 +2,8 @@ import firebase from "../firebase/firebase";
 import { Todo } from "../components/Todo.vue";
 
 class TodoService {
-  db: firebase.firestore.Firestore;
-  detach: () => void;
+  private db: firebase.firestore.Firestore;
+  private detach: () => void;
 
   constructor(db: firebase.firestore.Firestore) {
     this.db = db;

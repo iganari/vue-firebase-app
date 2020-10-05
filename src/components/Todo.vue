@@ -1,5 +1,9 @@
 <template>
   <div class="container">
+    <div class="navbar-container">
+      <span class="navbar-user">ユーザー名</span>
+      <button class="navbar-logout">Logout</button>
+    </div>
     <h1>Todo App</h1>
     <div class="input-form">
       <label for="todo_name">タスク名</label>
@@ -70,6 +74,21 @@ export default Vue.extend({
   display: flex;
   align-items: center;
   flex-direction: column;
+  width: 60%;
+  margin: 0 auto;
+}
+
+// ヘッダーのレイアウト
+.navbar {
+  &-container {
+    display: flex;
+    width: 100%;
+    justify-content: flex-end;
+  }
+
+  &-logout {
+    margin-left: 4px;
+  }
 }
 
 // タスク入力フォームのレイアウト

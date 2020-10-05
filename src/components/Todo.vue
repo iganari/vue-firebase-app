@@ -12,20 +12,10 @@
       <button @click="registerTodo" class="input-form-submit">登録</button>
     </div>
     <ul class="todos-container">
-      <li>
+      <li v-for="(todo, index) in todos" :key="index">
         <div class="todos-container-item">
           <span>
-            todo1
-          </span>
-          <span>
-            [X]
-          </span>
-        </div>
-      </li>
-      <li>
-        <div class="todos-container-item">
-          <span>
-            todo1
+            {{ todo.name }}
           </span>
           <span>
             [X]
@@ -40,18 +30,35 @@
 import Vue from "vue";
 import todoService from "@/service/TodoService";
 
+export interface Todo {
+  name: string;
+  isFinished: boolean;
+}
+
 interface Data {
+  todos: Todo[];
   todoName: string;
 }
 
 export default Vue.extend({
   name: "Todo",
   data: (): Data => ({
+    todos: [],
     todoName: ""
   }),
+  mounted() {
+    todoService.subscribe(this.fetchTodos);
+  },
+  beforeDestroy() {
+    todoService.unsubscribe();
+  },
   methods: {
+    fetchTodos(todos: Todo[]) {
+      this.todos = todos;
+    },
     registerTodo() {
       todoService.create(this.todoName);
+      this.todoName = "";
     }
   }
 });

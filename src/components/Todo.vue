@@ -36,17 +36,27 @@
         />
         <button @click="registerTodo" class="input-form-submit">登録</button>
       </div>
-      <ul class="todos-container">
-        <li v-for="(todo, index) in todos" :key="index">
-          <div class="todos-container-item">
-            <span>
-              {{ todo.name }}
-            </span>
-            <span>
-              [X]
-            </span>
-          </div>
-        </li>
+      <ul class="todos">
+        <template v-if="todos.length > 0">
+          <li class="todos-item" v-for="(todo, index) in todos" :key="index">
+            <div>
+              <span @click="checkTodo(todo)" class="todos-item-check">
+                [
+                {{ todo.isFinished ? "x" : "" }}
+                ]
+              </span>
+              <span>
+                {{ todo.name }}
+              </span>
+              <span @click="deleteTodo(todo)" class="todos-item-delete">
+                X
+              </span>
+            </div>
+          </li>
+        </template>
+        <template v-else>
+          <span>タスクはありません</span>
+        </template>
       </ul>
     </template>
     <template v-else>
@@ -62,7 +72,7 @@ import todoService from "@/service/TodoService";
 import firebase from "firebase";
 
 export interface Todo {
-  ownerId: string;
+  id: string;
   name: string;
   isFinished: boolean;
 }
@@ -121,8 +131,14 @@ export default Vue.extend({
       // タスク名が入力されていない場合、処理を行わない
       if (this.todoName.length === 0) return;
 
-      todoService.create(this.user.uid, this.todoName);
+      todoService.create(this.user?.uid || "", this.todoName);
       this.todoName = "";
+    },
+    async checkTodo(todo: Todo) {
+      await todoService.update(this.user?.uid || "", todo);
+    },
+    async deleteTodo(todo: Todo) {
+      await todoService.delete(this.user?.uid || "", todo);
     }
   }
 });
@@ -165,8 +181,14 @@ export default Vue.extend({
 
 // Todoタスクのレイアウト
 .todos {
-  &-container {
-    background-color: white;
+  font-size: 1.2rem;
+  background-color: white;
+  &-item {
+    margin-top: 8px;
+    &-check,
+    &-delete {
+      cursor: pointer;
+    }
   }
 }
 </style>

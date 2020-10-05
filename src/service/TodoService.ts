@@ -22,7 +22,11 @@ class TodoService {
       .onSnapshot(snapshot => {
         const todos: Todo[] = [];
         snapshot.forEach(doc => {
-          todos.push(doc.data() as Todo);
+          todos.push({
+            // @ts-ignore
+            id: doc.id,
+            ...(doc.data() as Todo)
+          });
         });
         callback(todos);
       });
@@ -47,6 +51,27 @@ class TodoService {
         name,
         isFinished: false
       });
+  }
+
+  update(ownerId: string, todo: Todo) {
+    this.db
+      .collection("users")
+      .doc(ownerId)
+      .collection("todos")
+      .doc(todo.id)
+      .update({
+        ...todo,
+        isFinished: !todo.isFinished
+      });
+  }
+
+  delete(ownerId: string, todo: Todo) {
+    this.db
+      .collection("users")
+      .doc(ownerId)
+      .collection("todos")
+      .doc(todo.id)
+      .delete();
   }
 }
 

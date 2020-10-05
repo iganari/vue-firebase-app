@@ -33,14 +33,8 @@
     "env": {
       "node": true
     },
-    "extends": [
-      "plugin:vue/essential",
-      "eslint:recommended",
-      "@vue/typescript/recommended",
-      "@vue/prettier",
-      "@vue/prettier/@typescript-eslint"
-    ],
     "parserOptions": {
+      "sourceType": "module",
       "ecmaVersion": 2020
     },
     "rules": {}

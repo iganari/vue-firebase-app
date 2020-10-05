@@ -3,34 +3,50 @@ import { Todo } from "../components/Todo.vue";
 
 class TodoService {
   private db: firebase.firestore.Firestore;
+  private targetOwnerId: string;
   private detach: () => void;
 
   constructor(db: firebase.firestore.Firestore) {
     this.db = db;
+    this.targetOwnerId = "";
     this.detach = () => {
       // NO STATEMENT
     };
   }
 
-  subscribe(callback: (todos: Todo[]) => void) {
-    this.unsubscribe = this.db.collection("todos").onSnapshot(snapshot => {
-      const todos: Todo[] = [];
-      snapshot.forEach(doc => {
-        todos.push(doc.data() as Todo);
+  subscribe(ownerId: string, callback: (todos: Todo[]) => void) {
+    this.unsubscribe = this.db
+      .collection("users")
+      .doc(ownerId)
+      .collection("todos")
+      .onSnapshot(snapshot => {
+        const todos: Todo[] = [];
+        snapshot.forEach(doc => {
+          todos.push(doc.data() as Todo);
+        });
+        callback(todos);
       });
-      callback(todos);
-    });
   }
 
   unsubscribe() {
     this.detach();
   }
 
-  create(name: string) {
-    this.db.collection("todos").add({
-      name,
-      isFinished: false
+  createOwner(ownerId: string) {
+    this.db.collection("users").add({
+      userId: ownerId
     });
+  }
+
+  create(ownerId: string, name: string) {
+    this.db
+      .collection("users")
+      .doc(ownerId)
+      .collection("todos")
+      .add({
+        name,
+        isFinished: false
+      });
   }
 }
 

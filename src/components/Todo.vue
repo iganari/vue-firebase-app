@@ -62,6 +62,7 @@ import todoService from "@/service/TodoService";
 import firebase from "firebase";
 
 export interface Todo {
+  ownerId: string;
   name: string;
   isFinished: boolean;
 }
@@ -84,8 +85,10 @@ export default Vue.extend({
     todoName: ""
   }),
   mounted() {
-    authenticationService.subscribe(this.setUser);
-    todoService.subscribe(this.fetchTodos);
+    authenticationService.subscribe(this.setUser, ownerId => {
+      todoService.unsubscribe();
+      todoService.subscribe(ownerId, this.fetchTodos);
+    });
   },
   beforeDestroy() {
     authenticationService.unsbscribe();
@@ -97,6 +100,9 @@ export default Vue.extend({
     },
     async register() {
       await authenticationService.register(this.email, this.password);
+      if (this.user) {
+        await todoService.createOwner(this.user.uid);
+      }
     },
     async login() {
       await authenticationService.login(this.email, this.password);
@@ -109,7 +115,13 @@ export default Vue.extend({
       this.todos = todos;
     },
     registerTodo() {
-      todoService.create(this.todoName);
+      // ログインしていない場合、処理を行わない
+      if (!this.user) return;
+
+      // タスク名が入力されていない場合、処理を行わない
+      if (this.todoName.length === 0) return;
+
+      todoService.create(this.user.uid, this.todoName);
       this.todoName = "";
     }
   }

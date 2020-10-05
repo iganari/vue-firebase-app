@@ -23,10 +23,14 @@ class AuthenticationService {
     await this.auth.signOut();
   }
 
-  subscribe(setUser: (user: firebase.User) => void) {
+  subscribe(
+    setUser: (user: firebase.User) => void,
+    callbackWithOwnerId: (ownerId: string) => void
+  ) {
     this.detach = this.auth.onAuthStateChanged(user => {
       if (user) {
         setUser(user);
+        callbackWithOwnerId(user.uid);
       }
     });
   }

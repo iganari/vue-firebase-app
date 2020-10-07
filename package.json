@@ -34,9 +34,11 @@
       "node": true
     },
     "parserOptions": {
+      "parser": "@typescript-eslint/parser",
       "sourceType": "module",
       "ecmaVersion": 2020
     },
+    "extends": ["plugin:vue/base"],
     "rules": {}
   },
   "browserslist": [
